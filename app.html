@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Not Wordle</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    body {
+      background-color: #121213;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    #board {
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 10px;
+    }
+    .row {
+      display: flex;
+      gap: 10px;
+    }
+    .cell {
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #3a3a3c;
+      font-size: 24px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .green { background-color: #538d4e; color: white; }
+    .yellow { background-color: #b59f3b; color: white; }
+    .gray { background-color: #3a3a3c; color: white; }
+    input {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 18px;
+      text-transform: uppercase;
+    }
+    button {
+      padding: 10px;
+      margin-left: 10px;
+      font-size: 18px;
+    }
+    #message {
+      margin-top: 20px;
+      font-size: 20px;
+      color: lightgreen;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">My Portfolio</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item"><a class="nav-link active" href="1-general.html">Resume</a></li>
+          <li class="nav-item"><a class="nav-link" href="scratch.html">Scratch Page</a></li>
+          <li class="nav-item"><a class="nav-link" href="web-app.html">Web App</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <h1>Not Wordle</h1>
+  <h2>(because it's cooler than Wordle)</h2>
+  <div id="board"></div>
+  <div>
+    <input type="text" id="guessInput" maxlength="5" autofocus>
+    <button onclick="submitGuess()">Guess</button>
+  </div>
+  <div id="message"></div>
+
+  <script>
+    const wordList = ['apple', 'grape', 'plant', 'brave', 'stone', 'crane', 'ozone'];
+    const secretWord = wordList[Math.floor(Math.random() * wordList.length)];
+    const board = document.getElementById('board');
+    let currentRow = 0;
+
+    for (let i = 0; i < 6; i++) {
+      const row = document.createElement('div');
+      row.classList.add('row');
+      for (let j = 0; j < 5; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        row.appendChild(cell);
+      }
+      board.appendChild(row);
+    }
+
+    function submitGuess() {
+      const input = document.getElementById('guessInput');
+      const guess = input.value.toLowerCase();
+      if (guess.length !== 5 || !/^[a-zA-Z]+$/.test(guess)) {
+        alert('Enter a valid 5-letter word.');
+        return;
+      }
+
+      const row = board.children[currentRow];
+      const letterCount = {};
+      for (let ch of secretWord) {
+        letterCount[ch] = (letterCount[ch] || 0) + 1;
+      }
+
+      for (let i = 0; i < 5; i++) {
+        row.children[i].innerText = guess[i];
+        if (guess[i] === secretWord[i]) {
+          row.children[i].classList.add('green');
+          letterCount[guess[i]]--;
+        }
+      }
+
+      for (let i = 0; i < 5; i++) {
+        if (guess[i] !== secretWord[i]) {
+          if (secretWord.includes(guess[i]) && letterCount[guess[i]] > 0) {
+            row.children[i].classList.add('yellow');
+            letterCount[guess[i]]--;
+          } else {
+            row.children[i].classList.add('gray');
+          }
+        }
+      }
+
+      if (guess === secretWord) {
+        document.getElementById('message').innerText = 'Congratulations! You guessed it!';
+        document.getElementById('guessInput').disabled = true;
+      } else if (currentRow === 5) {
+        document.getElementById('message').innerText = `Out of guesses! The word was "${secretWord.toUpperCase()}".`;
+        document.getElementById('guessInput').disabled = true;
+      } else {
+        currentRow++;
+        input.value = '';
+        input.focus();
+      }
+    }
+  </script>
+</body>
+</html>
